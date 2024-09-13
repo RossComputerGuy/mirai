@@ -1,0 +1,19 @@
+name: mirai
+description: A systems language designed for OOP & embedded use
+version: 0.1.0
+repository: https://github.com/RossComputerGuy/mirai
+
+environment:
+  sdk: ^3.5.2
+
+# Add regular dependencies here.
+dependencies:
+  petitparser: ^6.0.2
+  path: ^1.9.0
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.24.0
+
+executables:
+  mirai: mirai

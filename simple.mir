@@ -1,0 +1,15 @@
+typedef CString = CList<CByte, 0>;
+
+extern fn puts(str: CString) void;
+
+namespace example {
+  enum A {
+    a,
+  }
+}
+
+pub fn main() NoReturn<void> {
+  final str = "Hello";
+  puts(str);
+  unreachable;
+}
