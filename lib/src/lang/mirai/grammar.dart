@@ -75,9 +75,7 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   Parser start() => ref0(compilationUnit).end();
 
   Parser compilationUnit() =>
-      ref0(annotationCall).star() &
-      ref0(importDirective).star() &
-      ref0(topLevelDefinition).star();
+      ref0(importDirective).star() & ref0(topLevelDefinition).star();
 
   Parser importDirective() =>
       ref0(importToken) &
@@ -122,10 +120,11 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref0(constInitializedVariableDeclaration) & ref1(token, ';') |
       ref0(namespaceDefinition);
 
-  Parser annotationCall() =>
+  Parser annotationDirective() =>
       ref1(token, '@') & ref0(identifier) & ref0(arguments);
 
   Parser classDefinition() =>
+      ref0(annotationDirective).star() &
       ref0(abstractToken).optional() &
       ref0(classToken) &
       ref0(identifier) &
@@ -137,6 +136,7 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref1(token, '}');
 
   Parser interfaceDefinition() =>
+      ref0(annotationDirective).star() &
       ref0(interfaceToken) &
       ref0(identifier) &
       ref0(typeParameters).optional() &
@@ -147,6 +147,7 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref1(token, '}');
 
   Parser enumDefinition() =>
+      ref0(annotationDirective).star() &
       ref0(enumToken) &
       ref0(identifier) &
       ref0(superclass).optional() &
@@ -156,6 +157,7 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref1(token, '}');
 
   Parser structDefinition() =>
+      ref0(annotationDirective).star() &
       ref0(structToken) &
       ref0(identifier) &
       ref0(typeParameters).optional() &
@@ -164,7 +166,8 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref1(token, '}');
 
   Parser functionDeclaration() =>
-      ref0(exportToken).optional() &
+      ref0(annotationDirective).star() &
+          ref0(exportToken).optional() &
           ref0(pubToken).optional() &
           ref0(fnToken) &
           ref0(identifier) &
@@ -289,36 +292,40 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   Parser interfaces() => ref0(implementsToken) & ref0(typeList);
 
   Parser classMemberDefinition() =>
-      ref0(declaration) & ref1(token, ';') |
-      ref0(constructorDeclaration) & ref1(token, ';') |
-      ref0(methodDeclaration) & ref0(functionBodyOrExtern) |
-      ref0(constToken) &
-          ref0(factoryConstructorDeclaration) &
-          ref0(functionExtern);
+      ref0(annotationDirective).star() &
+      (ref0(declaration) & ref1(token, ';') |
+          ref0(constructorDeclaration) & ref1(token, ';') |
+          ref0(methodDeclaration) & ref0(functionBodyOrExtern) |
+          ref0(constToken) &
+              ref0(factoryConstructorDeclaration) &
+              ref0(functionExtern));
 
   Parser enumMemberDefinition() =>
-      ref0(identifier) & ref1(token, ',') |
-      ref0(constructorDeclaration) & ref1(token, ';') |
-      ref0(methodDeclaration) & ref0(functionBodyOrExtern) |
-      ref0(constToken) &
-          ref0(factoryConstructorDeclaration) &
-          ref0(functionExtern);
+      ref0(annotationDirective).star() &
+      (ref0(identifier) & ref1(token, ',') |
+          ref0(constructorDeclaration) & ref1(token, ';') |
+          ref0(methodDeclaration) & ref0(functionBodyOrExtern) |
+          ref0(constToken) &
+              ref0(factoryConstructorDeclaration) &
+              ref0(functionExtern));
 
   Parser factoryConstructorDeclaration() =>
-      ref0(factoryToken) &
-      ref0(qualified) &
-      ref0(typeParameters).optional() &
-      (ref1(token, '.') & ref0(identifier)).optional() &
-      ref0(formalParameterList);
+      ref0(annotationDirective).star() &
+      (ref0(factoryToken) &
+          ref0(qualified) &
+          ref0(typeParameters).optional() &
+          (ref1(token, '.') & ref0(identifier)).optional() &
+          ref0(formalParameterList));
 
   Parser constructorDeclaration() =>
-      ref0(constToken).optional() &
-          ref0(identifier) &
-          ref0(formalParameterList) &
-          (ref0(redirection) | ref0(initializers)).optional() |
-      ref0(constToken).optional() &
-          ref0(namedConstructorDeclaration) &
-          (ref0(redirection) | ref0(initializers)).optional();
+      ref0(annotationDirective).star() &
+      (ref0(constToken).optional() &
+              ref0(identifier) &
+              ref0(formalParameterList) &
+              (ref0(redirection) | ref0(initializers)).optional() |
+          ref0(constToken).optional() &
+              ref0(namedConstructorDeclaration) &
+              (ref0(redirection) | ref0(initializers)).optional());
 
   Parser namedConstructorDeclaration() =>
       ref0(identifier) &
@@ -327,15 +334,16 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref0(formalParameterList);
 
   Parser specialSignatureDefinition() =>
-      ref0(staticToken).optional() &
-          ref0(getOrSet) &
-          ref0(identifier) &
-          ref0(returnType).optional() &
-          ref0(formalParameterList) |
-      ref0(operatorToken) &
-          ref0(userDefinableOperator) &
-          ref0(formalParameterList) &
-          ref0(returnType).optional();
+      ref0(annotationDirective).star() &
+      (ref0(staticToken).optional() &
+              ref0(getOrSet) &
+              ref0(identifier) &
+              ref0(returnType).optional() &
+              ref0(formalParameterList) |
+          ref0(operatorToken) &
+              ref0(userDefinableOperator) &
+              ref0(formalParameterList) &
+              ref0(returnType).optional());
 
   Parser userDefinableOperator() =>
       ref0(multiplicativeOperator) |
@@ -438,9 +446,10 @@ class MiraiGrammarDefinition extends GrammarDefinition {
           ref1(token, ';');
 
   Parser declaredIdentifier() =>
-      ref0(finalToken) & ref0(identifier) & ref0(typeIdentifier).optional() |
-      ref0(varToken) & ref0(identifier) |
-      ref0(identifier) & ref0(typeIdentifier);
+      ref0(annotationDirective).star() &
+      (ref0(finalToken) & ref0(identifier) & ref0(typeIdentifier).optional() |
+          ref0(varToken) & ref0(identifier) |
+          ref0(identifier) & ref0(typeIdentifier));
 
   Parser typeIdentifier() => ref1(token, ':') & ref0(type);
 
@@ -564,7 +573,10 @@ class MiraiGrammarDefinition extends GrammarDefinition {
           ref0(falseToken) |
           ref0(hexNumberLexicalToken) |
           ref0(numberLexicalToken) |
-          ref0(stringLexicalToken));
+          ref0(stringLexicalToken) |
+          ref0(enumLiteral));
+
+  Parser enumLiteral() => ref1(token, '.') & ref0(identifier);
 
   Parser compoundLiteral() => ref0(listLiteral) | ref0(mapLiteral);
 
