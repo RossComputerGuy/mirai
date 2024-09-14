@@ -1,10 +1,14 @@
 import 'package:petitparser/petitparser.dart';
 import 'qualified.dart';
 
-class MiraiBoolean {
-  final bool value;
+abstract class MiraiTypeLiteral<T> {
+  final T value;
 
-  const MiraiBoolean(this.value);
+  const MiraiTypeLiteral(this.value);
+}
+
+class MiraiBoolean extends MiraiTypeLiteral<bool> {
+  const MiraiBoolean(bool value) : super(value);
 
   @override
   bool operator ==(Object other) {
@@ -25,12 +29,10 @@ class MiraiBoolean {
   static const falseValue = MiraiBoolean(false);
 }
 
-class MiraiNumber {
-  final num value;
-
-  const MiraiNumber(this.value);
-  const MiraiNumber.int(int _value) : value = _value;
-  const MiraiNumber.double(double _value) : value = _value;
+class MiraiNumber extends MiraiTypeLiteral<num> {
+  const MiraiNumber(num value) : super(value);
+  const MiraiNumber.int(int _value) : super(_value);
+  const MiraiNumber.double(double _value) : super(_value);
 
   int get asInt => value as int;
   double get asDouble => value as double;
@@ -51,10 +53,8 @@ class MiraiNumber {
   String toString() => 'MiraiNumber(${value.toString()})';
 }
 
-class MiraiEnumLiteral {
-  final MiraiQualified value;
-
-  const MiraiEnumLiteral(this.value);
+class MiraiEnumLiteral extends MiraiTypeLiteral<MiraiQualified> {
+  const MiraiEnumLiteral(MiraiQualified value) : super(value);
 
   @override
   bool operator ==(Object other) {
@@ -62,8 +62,12 @@ class MiraiEnumLiteral {
       return other.value == value;
     }
 
+    if (other is MiraiQualified) {
+      return other == value;
+    }
+
     if (other is String) {
-      return other.toString() == value.toString();
+      return other == value.toString();
     }
     return false;
   }
@@ -72,10 +76,8 @@ class MiraiEnumLiteral {
   String toString() => 'MiraiEnumLiteral($value)';
 }
 
-class MiraiString {
-  final String value;
-
-  const MiraiString(this.value);
+class MiraiString extends MiraiTypeLiteral<String> {
+  const MiraiString(String value) : super(value);
 
   @override
   bool operator ==(Object other) {
@@ -134,6 +136,16 @@ class MiraiLiteral {
   MiraiQualified get asEnumLiteral {
     assert(isEnumLiteral);
     return (_value as MiraiEnumLiteral).value;
+  }
+
+  MiraiTypeLiteral? get asTypeLiteral {
+    if (isNull) return null;
+    return (_value as MiraiTypeLiteral<dynamic>);
+  }
+
+  dynamic get value {
+    if (isNull) return null;
+    return (_value as MiraiTypeLiteral<dynamic>).value;
   }
 
   @override

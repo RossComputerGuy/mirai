@@ -40,10 +40,10 @@ class MiraiImport {
     final opts = [
       scope != null ? 'scope: \"$scope\"' : null,
       visible.length > 0
-          ? 'visible: [${visible.map((x) => '$x').join(', ')}]'
+          ? 'visible: [${visible.map((x) => '\"$x\"').join(', ')}]'
           : null,
       hidden.length > 0
-          ? 'hidden: [${hidden.map((x) => '$x').join(', ')}]'
+          ? 'hidden: [${hidden.map((x) => '\"$x\"').join(', ')}]'
           : null,
     ].where((x) => x != null);
     return 'MiraiImport(\"${name}\"${opts.length > 0 ? ', ' : ''}${opts.join(', ')})';

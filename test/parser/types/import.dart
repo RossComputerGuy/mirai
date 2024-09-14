@@ -7,31 +7,40 @@ void testImport() {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.importDirective());
     final result = parser.parse('import "a/b/c";');
-    expect(MiraiImport.fromParsed(result.value), MiraiImport('a/b/c'));
+    final parsed = MiraiImport.fromParsed(result.value);
+
+    expect(parsed, MiraiImport('a/b/c'));
+    expect(parsed.toString(), 'MiraiImport("a/b/c")');
   });
 
   test('fromParsed with as', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.importDirective());
     final result = parser.parse('import "a/b/c" as d;');
-    expect(
-        MiraiImport.fromParsed(result.value), MiraiImport('a/b/c', scope: 'd'));
+    final parsed = MiraiImport.fromParsed(result.value);
+
+    expect(parsed, MiraiImport('a/b/c', scope: 'd'));
+    expect(parsed.toString(), 'MiraiImport("a/b/c", scope: "d")');
   });
 
   test('fromParsed with show', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.importDirective());
     final result = parser.parse('import "a/b/c" show d;');
-    expect(MiraiImport.fromParsed(result.value),
-        MiraiImport('a/b/c', visible: ['d']));
+    final parsed = MiraiImport.fromParsed(result.value);
+
+    expect(parsed, MiraiImport('a/b/c', visible: ['d']));
+    expect(parsed.toString(), 'MiraiImport("a/b/c", visible: ["d"])');
   });
 
   test('fromParsed with hide', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.importDirective());
     final result = parser.parse('import "a/b/c" hide d;');
-    expect(MiraiImport.fromParsed(result.value),
-        MiraiImport('a/b/c', hidden: ['d']));
+    final parsed = MiraiImport.fromParsed(result.value);
+
+    expect(parsed, MiraiImport('a/b/c', hidden: ['d']));
+    expect(parsed.toString(), 'MiraiImport("a/b/c", hidden: ["d"])');
   });
 
   test('fromParsed with as, show', () {

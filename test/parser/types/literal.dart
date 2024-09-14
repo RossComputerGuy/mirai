@@ -1,4 +1,5 @@
 import 'package:mirai/src/lang/mirai/types/literal.dart';
+import 'package:mirai/src/lang/mirai/types/qualified.dart';
 import 'package:mirai/src/lang/mirai/grammar.dart';
 import 'package:test/test.dart';
 
@@ -7,14 +8,23 @@ void testLiteral() {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.literal());
     final result = parser.parse('null');
-    expect(MiraiLiteral.fromParsed(result.value).isNull, true);
+    final parsed = MiraiLiteral.fromParsed(result.value);
+
+    expect(parsed, MiraiLiteral(null));
+    expect(parsed.isNull, true);
   });
 
   test('fromParsed true', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.literal());
     final result = parser.parse('true');
-    expect(MiraiLiteral.fromParsed(result.value).isTrue, true);
+    final parsed = MiraiLiteral.fromParsed(result.value);
+
+    expect(parsed, MiraiLiteral.bool(true));
+    expect(parsed.isTrue, true);
+    expect((parsed.asTypeLiteral as MiraiBoolean) == true, true);
+    expect(parsed.value, true);
+    expect(parsed.toString(), 'MiraiLiteral(MiraiBoolean(true))');
   });
 
   test('fromParsed false', () {
@@ -28,7 +38,10 @@ void testLiteral() {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.literal());
     final result = parser.parse('0xFFFF');
-    expect(MiraiLiteral.fromParsed(result.value).asInt, 0xFFFF);
+    final parsed = MiraiLiteral.fromParsed(result.value);
+
+    expect(parsed.asInt, 0xFFFF);
+    expect((parsed.asTypeLiteral as MiraiNumber) == 0xFFFF, true);
   });
 
   test('fromParsed 123456', () {
@@ -61,15 +74,24 @@ void testLiteral() {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.literal());
     final result = parser.parse('"Hello"');
-    expect(MiraiLiteral.fromParsed(result.value).asString, 'Hello');
+    final parsed = MiraiLiteral.fromParsed(result.value);
+
+    expect(parsed.asString, 'Hello');
+    expect((parsed.asTypeLiteral as MiraiString) == 'Hello', true);
   });
 
   test('fromParsed .enumLiteral', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.literal());
     final result = parser.parse('.enumLiteral');
-    expect(MiraiLiteral.fromParsed(result.value).asEnumLiteral.toString(),
-        'enumLiteral');
+    final parsed = MiraiLiteral.fromParsed(result.value);
+
+    expect(parsed.asEnumLiteral.toString(), 'enumLiteral');
+    expect(
+        (parsed.asTypeLiteral as MiraiEnumLiteral) ==
+            MiraiQualified(['enumLiteral']),
+        true);
+    expect((parsed.asTypeLiteral as MiraiEnumLiteral) == 'enumLiteral', true);
   });
 }
 

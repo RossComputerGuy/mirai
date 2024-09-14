@@ -9,16 +9,21 @@ void testType() {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.type());
     final result = parser.parse('null');
-    expect(MiraiType.fromParsed(result.value),
-        MiraiType.literal(MiraiLiteral(null)));
+    final parsed = MiraiType.fromParsed(result.value);
+
+    expect(parsed, MiraiType.literal(MiraiLiteral(null)));
+    expect(parsed.isTypeLiteral, true);
+    expect(parsed.toString(), 'MiraiType(MiraiLiteral(null))');
   });
 
   test('fromParsed qualified', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.type());
     final result = parser.parse('AnType');
-    expect(MiraiType.fromParsed(result.value),
-        MiraiType.qualified(MiraiQualified(['AnType'])));
+    final parsed = MiraiType.fromParsed(result.value);
+
+    expect(parsed, MiraiType.qualified(MiraiQualified(['AnType'])));
+    expect(parsed.isTypeQualified, true);
   });
 
   test('fromParsed literal - 1 argument', () {
@@ -83,12 +88,12 @@ void testType() {
   test('fromParsed qualified - 3 arguments', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.type());
-    final result = parser.parse('AnType<B, 1, .abc>');
+    final result = parser.parse('AnType<1, 12.3, .abc>');
     expect(
         MiraiType.fromParsed(result.value),
         MiraiType.qualified(MiraiQualified(['AnType']), [
-          MiraiType.qualified(MiraiQualified(['B'])),
           MiraiType.literal(MiraiLiteral.int(1)),
+          MiraiType.literal(MiraiLiteral.double(12.3)),
           MiraiType.literal(MiraiLiteral.enumLiteral(MiraiQualified(['abc']))),
         ]));
   });
