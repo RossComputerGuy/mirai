@@ -6,6 +6,23 @@ namespace example {
   enum A {
     a,
   }
+
+  enum B {
+    b,
+  }
+}
+
+enum C {
+  a,
+  b,
+  c,
+
+  fn d() void {}
+}
+
+enum D {
+  static final a = "B";
+  static final c: String = "A";
 }
 
 pub fn main() NoReturn<void> {

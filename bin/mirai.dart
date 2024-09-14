@@ -1,6 +1,9 @@
 import 'dart:io';
+
 import 'package:mirai/src/lang/mirai/grammar.dart';
+import 'package:mirai/src/lang/mirai/types.dart';
 import 'package:mirai/mirai.dart';
+import 'package:petitparser/petitparser.dart';
 
 void printHelp() {
   stdout.writeAll([
@@ -46,7 +49,16 @@ Future<void> parse(List<String> args) async {
   final source = await File(source_file!).readAsString();
 
   final parser = MiraiGrammarDefinition().build();
-  print(parser.parse(source));
+  switch (parser.parse(source)) {
+    case Success(value: final value):
+      print(value[1]
+          .map((parsed) => MiraiTopLevelDefinition.fromParsed(parsed))
+          .toList());
+      break;
+    case Failure(position: final position, message: final message):
+      stderr.writeln('${Token.positionString(source, position)} - $message');
+      exit(1);
+  }
 }
 
 Future<void> main(List<String> args) async {
