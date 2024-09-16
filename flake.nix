@@ -34,6 +34,9 @@
 
             src = lib.cleanSource inputs.self;
 
+            nativeCheckInputs = [ pkgs.lcov ];
+            outputs = [ "coverage" ];
+
             pubspecLock = lib.importJSON ./pubspec.lock.json;
 
             sdkSourceBuilders = {
@@ -55,13 +58,35 @@
                 '';
             };
 
+            doCheck = true;
+
+            checkPhase = ''
+              runHook preCheck
+              packageRun test --coverage=./coverage -r expanded
+              runHook postCheck
+            '';
+
+            coveragePhase = ''
+              packageRunCustom coverage format_coverage bin -- --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
+              genhtml -o $coverage ./coverage/lcov.info
+            '';
+
+            postCheck = ''
+              runHook coveragePhase
+            '';
+
             meta.mainProgram = "mirai";
           };
 
           legacyPackages = pkgs;
 
           devShells.default = self.packages.default.overrideAttrs (
-            f: p: { nativeBuildInputs = p.nativeBuildInputs ++ [ pkgs.yq ]; }
+            f: p: {
+              nativeBuildInputs = p.nativeBuildInputs ++ [
+                pkgs.yq
+                pkgs.lcov
+              ];
+            }
           );
         };
       in
