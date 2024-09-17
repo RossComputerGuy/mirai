@@ -34,7 +34,10 @@
 
             src = lib.cleanSource inputs.self;
 
-            nativeCheckInputs = [ pkgs.lcov ];
+            nativeCheckInputs = [
+              pkgs.lcov
+              pkgs.jq
+            ];
             outputs = [ "coverage" ];
 
             pubspecLock = lib.importJSON ./pubspec.lock.json;
@@ -62,12 +65,12 @@
 
             checkPhase = ''
               runHook preCheck
-              packageRun test --coverage=./coverage -r expanded
+              dart --packages=.dart_tool/package_config.json $(jq --raw-output '.packages.[] | select(.name == "test") .rootUri | sub("file://"; "")' .dart_tool/package_config.json)/bin/test.dart --coverage=./coverage -r expanded
               runHook postCheck
             '';
 
             coveragePhase = ''
-              packageRunCustom coverage format_coverage bin -- --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
+              dart --packages=.dart_tool/package_config.json $(jq --raw-output '.packages.[] | select(.name == "coverage") .rootUri | sub("file://"; "")' .dart_tool/package_config.json)/bin/format_coverage.dart --packages=.dart_tool/package_config.json --report-on=lib --lcov -o ./coverage/lcov.info -i ./coverage
               genhtml -o $coverage ./coverage/lcov.info
             '';
 
@@ -81,12 +84,7 @@
           legacyPackages = pkgs;
 
           devShells.default = self.packages.default.overrideAttrs (
-            f: p: {
-              nativeBuildInputs = p.nativeBuildInputs ++ [
-                pkgs.yq
-                pkgs.lcov
-              ];
-            }
+            f: p: { nativeBuildInputs = p.nativeBuildInputs ++ [ pkgs.yq ]; }
           );
         };
       in
