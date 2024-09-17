@@ -885,8 +885,6 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   // -----------------------------------------------------------------
   // Whitespace and comments.
   // -----------------------------------------------------------------
-  Parser hiddenWhitespace() => ref0(hiddenStuffWhitespace).plus();
-
   Parser hiddenStuffWhitespace() =>
       ref0(visibleWhitespace) |
       ref0(singleLineComment) |
