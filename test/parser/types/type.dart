@@ -14,6 +14,7 @@ void testType() {
     expect(parsed, MiraiType.literal(MiraiLiteral(null)));
     expect(parsed.isTypeLiteral, true);
     expect(parsed.toString(), 'MiraiType(MiraiLiteral(null))');
+    expect(parsed.asLiteral, MiraiLiteral(null));
   });
 
   test('fromParsed qualified', () {
@@ -24,6 +25,7 @@ void testType() {
 
     expect(parsed, MiraiType.qualified(MiraiQualified(['AnType'])));
     expect(parsed.isTypeQualified, true);
+    expect(parsed.asQualified, MiraiQualified(['AnType']));
   });
 
   test('fromParsed literal - 1 argument', () {

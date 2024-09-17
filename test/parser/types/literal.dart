@@ -1,6 +1,7 @@
 import 'package:mirai/src/lang/mirai/types/literal.dart';
 import 'package:mirai/src/lang/mirai/types/qualified.dart';
 import 'package:mirai/src/lang/mirai/grammar.dart';
+import 'package:petitparser/petitparser.dart';
 import 'package:test/test.dart';
 
 void testLiteral() {
@@ -48,14 +49,20 @@ void testLiteral() {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.literal());
     final result = parser.parse('123456');
-    expect(MiraiLiteral.fromParsed(result.value).asInt, 123456);
+    final parsed = MiraiLiteral.fromParsed(result.value);
+
+    expect(parsed.asInt, 123456);
+    expect(parsed.toString(), 'MiraiLiteral(MiraiNumber(123456))');
   });
 
   test('fromParsed 12.34', () {
     final grammar = MiraiGrammarDefinition();
     final parser = grammar.buildFrom(grammar.literal());
     final result = parser.parse('12.34');
-    expect(MiraiLiteral.fromParsed(result.value).asDouble, 12.34);
+    final parsed = MiraiLiteral.fromParsed(result.value);
+
+    expect(parsed.asDouble, 12.34);
+    expect(parsed.toString(), 'MiraiLiteral(MiraiNumber(12.34))');
   });
 
   test('fromParsed multi-line String', () {
@@ -78,6 +85,7 @@ void testLiteral() {
 
     expect(parsed.asString, 'Hello');
     expect((parsed.asTypeLiteral as MiraiString) == 'Hello', true);
+    expect(parsed.toString(), 'MiraiLiteral(MiraiString(\"Hello\"))');
   });
 
   test('fromParsed .enumLiteral', () {
@@ -92,6 +100,28 @@ void testLiteral() {
             MiraiQualified(['enumLiteral']),
         true);
     expect((parsed.asTypeLiteral as MiraiEnumLiteral) == 'enumLiteral', true);
+    expect(parsed.toString(), 'MiraiLiteral(MiraiEnumLiteral(enumLiteral))');
+  });
+
+  test('fromParsed invalid', () {
+    expect(() => MiraiLiteral.fromParsed(Token<dynamic>('abc', 'abc', 0, 3)),
+        throwsA(isA<Exception>()));
+    expect(
+        () => MiraiLiteral.fromParsed(Token<Token<dynamic>>(
+            Token<dynamic>('abc', 'abc', 0, 3), 'abc', 0, 3)),
+        throwsA(isA<Exception>()));
+    expect(
+        () => MiraiLiteral.fromParsed(Token<List<dynamic>>([
+              'a',
+              Token<String>('b', 'b', 1, 2),
+            ], 'ab', 0, 2)),
+        throwsA(isA<Exception>()));
+    expect(
+        () => MiraiLiteral.fromParsed(Token<List<dynamic>>([
+              Token<String>('a', 'a', 0, 1),
+              Token<String>('b', 'b', 1, 2),
+            ], '0xb', 0, 2)),
+        throwsA(isA<Exception>()));
   });
 }
 

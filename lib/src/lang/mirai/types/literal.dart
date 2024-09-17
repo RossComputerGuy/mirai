@@ -170,41 +170,43 @@ class MiraiLiteral {
       };
     }
 
-    if (parsed.value.length == 2) {
-      if (parsed.value[0] is String) {
-        if (parsed.value[0].toLowerCase() != '0x') {
-          throw Exception('Cannot parse hex: ${parsed.value[0]}');
+    if (parsed.value is List<dynamic>) {
+      if (parsed.value.length == 2) {
+        if (parsed.value[0] is String) {
+          if (parsed.value[0].toLowerCase() != '0x') {
+            throw Exception('Cannot parse hex: ${parsed.value[0]}');
+          }
+          return MiraiLiteral(MiraiNumber(
+              int.parse('0x' + parsed.value[1].join('').toLowerCase())));
         }
-        return MiraiLiteral(MiraiNumber(
-            int.parse('0x' + parsed.value[1].join('').toLowerCase())));
-      }
-      if (parsed.value[0] is Token<dynamic>) {
-        if (parsed.value[0].value != '.') {
-          throw Exception(
-              'Cannot parse enum literal: ${parsed.value[0].value}');
+        if (parsed.value[0] is Token<dynamic>) {
+          if (parsed.value[0].value != '.') {
+            throw Exception(
+                'Cannot parse enum literal: ${parsed.value[0].value}');
+          }
+
+          return MiraiLiteral(MiraiEnumLiteral(
+              MiraiQualified.fromParsed(parsed.value[1].value)));
         }
-
-        return MiraiLiteral(
-            MiraiEnumLiteral(MiraiQualified.fromParsed(parsed.value[1].value)));
       }
-    }
 
-    if (parsed.value.length == 4) {
-      final value = parsed.value.where((x) => x != null).toList();
-      if (value.length == 2) {
-        return MiraiLiteral(MiraiNumber(
-            double.parse(value[0].join() + '.' + value[1][1].join())));
-      } else if (value.length == 1) {
-        return MiraiLiteral(MiraiNumber(int.parse(value[0].join())));
+      if (parsed.value.length == 4) {
+        final value = parsed.value.where((x) => x != null).toList();
+        if (value.length == 2) {
+          return MiraiLiteral(MiraiNumber(
+              double.parse(value[0].join() + '.' + value[1][1].join())));
+        } else if (value.length == 1) {
+          return MiraiLiteral(MiraiNumber(int.parse(value[0].join())));
+        }
       }
-    }
 
-    if (parsed.value.length == 3) {
-      return MiraiLiteral(MiraiString(parsed.value[1].join()));
-    }
+      if (parsed.value.length == 3) {
+        return MiraiLiteral(MiraiString(parsed.value[1].join()));
+      }
 
-    if (parsed.value.length == 2) {
-      return MiraiLiteral(MiraiString(parsed.value[1][1].join('')));
+      if (parsed.value.length == 2) {
+        return MiraiLiteral(MiraiString(parsed.value[1][1].join('')));
+      }
     }
     throw Exception('Cannot parse: $parsed');
   }
