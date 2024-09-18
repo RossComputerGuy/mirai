@@ -1,3 +1,7 @@
+import 'package:mirai/src/lang/mirai/types/statement/block.dart';
+import 'package:mirai/src/lang/mirai/types/statement/continue.dart';
+import 'package:mirai/src/lang/mirai/types/statement/defer.dart';
+import 'package:mirai/src/lang/mirai/types/statement/unreachable.dart';
 import 'package:mirai/src/lang/mirai/types/statement.dart';
 import 'package:mirai/src/lang/mirai/grammar.dart';
 import 'package:test/test.dart';
@@ -9,8 +13,146 @@ void testStatement() {
     final result = parser.parse('label: { break label; }');
     final parsed = MiraiStatement.fromParsed(result.value);
 
-    expect(parsed, MiraiStatement(labels: ['label']));
-    expect(parsed.toString(), 'MiraiStatement(labels: [\"label\"])');
+    expect(parsed, MiraiStatement(MiraiBlockStatement(), labels: ['label']));
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiBlockStatement([MiraiStatement(MiraiBreakStatement(\"label\"), labels: [])]), labels: [\"label\"])');
+  });
+
+  test('fromParsed defer', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('defer {}');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(
+        parsed,
+        MiraiStatement(
+            MiraiDeferStatement(MiraiStatement(MiraiBlockStatement()))));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiDeferStatement(MiraiStatement(MiraiBlockStatement([]), labels: []), isError: false, isPre: false), labels: [])');
+  });
+
+  test('fromParsed defer preret', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('defer preret {}');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(
+        parsed,
+        MiraiStatement(MiraiDeferStatement(
+            MiraiStatement(MiraiBlockStatement()),
+            isPre: true)));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiDeferStatement(MiraiStatement(MiraiBlockStatement([]), labels: []), isError: false, isPre: true), labels: [])');
+  });
+
+  test('fromParsed defer postret', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('defer postret {}');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(
+        parsed,
+        MiraiStatement(MiraiDeferStatement(
+            MiraiStatement(MiraiBlockStatement()),
+            isPre: false)));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiDeferStatement(MiraiStatement(MiraiBlockStatement([]), labels: []), isError: false, isPre: false), labels: [])');
+  });
+
+  test('fromParsed errdefer', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('errdefer {}');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(
+        parsed,
+        MiraiStatement(MiraiDeferStatement(
+            MiraiStatement(MiraiBlockStatement()),
+            isError: true)));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiDeferStatement(MiraiStatement(MiraiBlockStatement([]), labels: []), isError: true, isPre: false), labels: [])');
+  });
+
+  test('fromParsed errdefer postret', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('errdefer postret {}');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(
+        parsed,
+        MiraiStatement(MiraiDeferStatement(
+            MiraiStatement(MiraiBlockStatement()),
+            isError: true,
+            isPre: false)));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiDeferStatement(MiraiStatement(MiraiBlockStatement([]), labels: []), isError: true, isPre: false), labels: [])');
+  });
+
+  test('fromParsed errdefer preret', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('errdefer preret {}');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(
+        parsed,
+        MiraiStatement(MiraiDeferStatement(
+            MiraiStatement(MiraiBlockStatement()),
+            isError: true,
+            isPre: true)));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiDeferStatement(MiraiStatement(MiraiBlockStatement([]), labels: []), isError: true, isPre: true), labels: [])');
+  });
+
+  test('fromParsed continue', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('continue;');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(parsed, MiraiStatement(MiraiContinueStatement()));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiContinueStatement(), labels: [])');
+  });
+
+  test('fromParsed continue labeled', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('continue label;');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(parsed, MiraiStatement(MiraiContinueStatement('label')));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiContinueStatement(\"label\"), labels: [])');
+  });
+
+  test('fromParsed unreachable', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('unreachable;');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(parsed, MiraiStatement(MiraiUnreachableStatement()));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiUnreachableStatement(), labels: [])');
+  });
+
+  test('fromParsed invalid', () {
+    expect(() => MiraiStatement.valueFromParsed([]), throwsA(isA<Exception>()));
   });
 }
 

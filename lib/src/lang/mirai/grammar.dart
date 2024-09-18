@@ -434,11 +434,11 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref0(iterationStatement) |
       ref0(selectionStatement) |
       ref0(tryStatement) |
+      ref0(nonLabelledGenericStatement) |
       ref0(breakToken) & ref0(identifier).optional() & ref1(token, ';') |
       ref0(continueToken) & ref0(identifier).optional() & ref1(token, ';') |
       ref0(returnToken) & ref0(expression).optional() & ref1(token, ';') |
       ref0(expression).optional() & ref1(token, ';') |
-      ref0(nonLabelledGenericStatement) |
       ref0(functionDeclaration) & ref0(functionBody);
 
   Parser nonLabelledGenericStatement() =>
