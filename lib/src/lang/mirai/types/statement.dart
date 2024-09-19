@@ -1,4 +1,5 @@
 import 'package:petitparser/petitparser.dart';
+import 'statement/asm.dart';
 import 'statement/block.dart';
 import 'statement/break.dart';
 import 'statement/continue.dart';
@@ -34,6 +35,13 @@ class MiraiStatement {
       'MiraiStatement($value, labels: [${labels.map((label) => '\"$label\"').join(', ')}])';
 
   static Object valueFromParsed(List<dynamic> parsed) {
+    if (parsed.length == 7) {
+      switch (parsed[0].value) {
+        case 'asm':
+          return MiraiAsmStatement.fromParsed(parsed);
+      }
+    }
+
     if (parsed.length == 3) {
       if (parsed[0] is Token<dynamic> && parsed[2] is Token<dynamic>) {
         if (parsed[0].value == '{' && parsed[2].value == '}') {

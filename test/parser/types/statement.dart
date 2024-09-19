@@ -1,3 +1,4 @@
+import 'package:mirai/src/lang/mirai/types/statement/asm.dart';
 import 'package:mirai/src/lang/mirai/types/statement/block.dart';
 import 'package:mirai/src/lang/mirai/types/statement/continue.dart';
 import 'package:mirai/src/lang/mirai/types/statement/defer.dart';
@@ -149,6 +150,42 @@ void testStatement() {
 
     expect(parsed.toString(),
         'MiraiStatement(MiraiUnreachableStatement(), labels: [])');
+  });
+
+  test('fromParsed asm', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('asm ("hlt");');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(parsed, MiraiStatement(MiraiAsmStatement('hlt')));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiAsmStatement(\"hlt\", isVolatile: false, params: {}), labels: [])');
+  });
+
+  test('fromParsed asm volatile', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('asm volatile ("hlt");');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(parsed, MiraiStatement(MiraiAsmStatement('hlt', isVolatile: true)));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiAsmStatement(\"hlt\", isVolatile: true, params: {}), labels: [])');
+  });
+
+  test('fromParsed asm with parameters', () {
+    final grammar = MiraiGrammarDefinition();
+    final parser = grammar.buildFrom(grammar.statement());
+    final result = parser.parse('asm ("hlt", "a": 1, "b": true, "c": value);');
+    final parsed = MiraiStatement.fromParsed(result.value);
+
+    expect(parsed, MiraiStatement(MiraiAsmStatement('hlt')));
+
+    expect(parsed.toString(),
+        'MiraiStatement(MiraiAsmStatement(\"hlt\", isVolatile: false, params: {a: MiraiExpression(isPointer: false), b: MiraiExpression(isPointer: false), c: MiraiExpression(isPointer: false)}), labels: [])');
   });
 
   test('fromParsed invalid', () {
