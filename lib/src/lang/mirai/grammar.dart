@@ -428,7 +428,6 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   Parser nonLabelledStatement() =>
       ref0(block) |
       ref0(deferStatement) |
-      ref0(initializedVariableDeclaration) & ref1(token, ';') |
       ref0(iterationStatement) |
       ref0(selectionStatement) |
       ref0(tryStatement) |
@@ -436,6 +435,7 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref0(breakToken) & ref0(identifier).optional() & ref1(token, ';') |
       ref0(continueToken) & ref0(identifier).optional() & ref1(token, ';') |
       ref0(returnToken) & ref0(expression).optional() & ref1(token, ';') |
+      ref0(initializedVariableDeclaration) & ref1(token, ';') |
       ref0(expression).optional() & ref1(token, ';') |
       ref0(functionDeclaration) & ref0(functionBody);
 
