@@ -43,12 +43,14 @@ class MiraiType {
 
   static MiraiType fromParsed(List<dynamic> parsed) {
     List<MiraiType> args = [];
-    if (parsed[1] != null) {
-      args.add(MiraiType.fromParsed(parsed[1][1][0]));
-      args.addAll(parsed[1][1][1]
-          .map((x) => MiraiType.fromParsed(x.sublist(1)[0]))
-          .cast<MiraiType>()
-          .toList());
+    if (parsed.length > 1) {
+      if (parsed[1] != null) {
+        args.add(MiraiType.fromParsed(parsed[1][1][0]));
+        args.addAll(parsed[1][1][1]
+            .map((x) => MiraiType.fromParsed(x.sublist(1)[0]))
+            .cast<MiraiType>()
+            .toList());
+      }
     }
 
     if (parsed[0] is Token) {

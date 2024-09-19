@@ -205,9 +205,7 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   Parser normalFormalParameter() =>
       ref0(fieldFormalParameter) |
       ref0(functionDeclaration) |
-      ref0(simpleFormalParameter);
-
-  Parser simpleFormalParameter() => ref0(declaredIdentifier) | ref0(identifier);
+      ref0(declaredIdentifier);
 
   Parser fieldFormalParameter() =>
       ref0(thisToken) & ref1(token, '.') & ref0(identifier);
@@ -455,9 +453,9 @@ class MiraiGrammarDefinition extends GrammarDefinition {
 
   Parser declaredIdentifier() =>
       ref0(annotationDirective).star() &
-      (ref0(finalToken) & ref0(identifier) & ref0(typeIdentifier).optional() |
-          ref0(varToken) & ref0(identifier) |
-          ref0(identifier) & ref0(typeIdentifier));
+      (ref0(finalToken) | ref0(varToken)).optional() &
+      ref0(identifier) &
+      ref0(typeIdentifier).optional();
 
   Parser typeIdentifier() => ref1(token, ':') & ref0(type);
 
@@ -548,21 +546,23 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   Parser nullSafetyAnnotations() => ref1(token, "?") | ref1(token, "!");
 
   Parser assignableSelector() =>
-      ref1(token, '[') & ref0(expression) & ref1(token, ']') |
-      ref1(token, '.') & ref0(identifier) & nullSafetyAnnotations().optional();
+      (ref1(token, '[') & ref0(expression) & ref1(token, ']') |
+          ref1(token, '.') & ref0(identifier)) &
+      nullSafetyAnnotations().optional();
 
   Parser primary() =>
-      ref0(thisToken) |
-      ref0(superToken) & ref0(assignableSelector) |
       ref0(constToken).optional() &
           ref0(typeArguments).optional() &
           ref0(compoundLiteral) |
-      (ref0(newToken) | ref0(constToken)) &
+      (ref0(newToken).optional() | ref0(constToken))
+              .seq(ref0(fnToken).not())
+              .pick(0) &
           ref0(type) &
-          (ref1(token, '.') & ref0(identifier)).optional() &
           ref0(arguments) |
       ref0(functionExpression) |
       ref0(expressionInParentheses) |
+      (ref0(thisToken) | ref0(superToken)) &
+          ref0(assignableSelector).optional() |
       ref0(literal) |
       ref0(identifier);
 
@@ -613,24 +613,22 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       ref0(expression);
 
   Parser functionExpression() =>
-      ref0(returnType).optional() &
+      ref0(fnToken) &
       ref0(identifier).optional() &
       ref0(formalParameterList) &
+      ref0(returnType).optional() &
       ref0(functionExpressionBody);
 
   Parser functionPrefix() => ref0(fnToken) & ref0(identifier);
 
   Parser functionBody() =>
-      ref1(token, '=>') & ref0(expression) & ref1(token, ';') | ref0(block);
+      ref1(token, '=>') & ref0(block) | (ref0(expression) & ref1(token, ';'));
 
   Parser functionExpressionBody() =>
-      ref1(token, '=>') & ref0(expression) | ref0(block);
+      ref1(token, '=>') & (ref0(block) | ref0(expression));
 
   Parser assignableExpression() =>
-      ref0(primary) &
-          (ref0(arguments).star() & ref0(assignableSelector)).plus() |
-      ref0(superToken) & ref0(assignableSelector) |
-      ref0(identifier);
+      ref0(primary) & (ref0(arguments) | ref0(assignableSelector)).star();
 
   Parser conditionalExpression() =>
       ref0(logicalOrExpression) &

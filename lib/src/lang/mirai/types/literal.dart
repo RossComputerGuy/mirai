@@ -1,4 +1,5 @@
 import 'package:petitparser/petitparser.dart';
+import 'expression.dart';
 import 'qualified.dart';
 
 abstract class MiraiTypeLiteral<T> {
@@ -208,6 +209,94 @@ class MiraiLiteral {
         return MiraiLiteral(MiraiString(parsed.value[1][1].join('')));
       }
     }
+    throw Exception('Cannot parse: $parsed');
+  }
+}
+
+class MiraiCompoundLiteral {
+  final Object value;
+
+  const MiraiCompoundLiteral.map(Map<String, MiraiExpression> _value)
+      : value = _value;
+  const MiraiCompoundLiteral.list(List<MiraiExpression> _value)
+      : value = _value;
+
+  bool get isList => value is List<MiraiExpression>;
+  bool get isMap => value is Map<String, MiraiExpression>;
+
+  List<MiraiExpression> get asList => value as List<MiraiExpression>;
+  Map<String, MiraiExpression> get asMap =>
+      value as Map<String, MiraiExpression>;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is MiraiCompoundLiteral) {
+      if (other.isList && isList) {
+        if (other.asList.length == asList.length) {
+          var i = 0;
+          while (i < asList.length) {
+            if (other.asList[i] != asList[i]) return false;
+            i++;
+          }
+
+          return true;
+        }
+      }
+
+      if (other.isMap && isMap) {
+        if (other.asMap.length == asMap.length) {
+          final otherEntries = other.asMap.entries.toList();
+          final entries = asMap.entries.toList();
+
+          var i = 0;
+          while (i < asMap.length) {
+            if (otherEntries[i].key != entries[i].key) return false;
+            if (otherEntries[i].value != entries[i].value) return false;
+            i++;
+          }
+
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  @override
+  String toString() {
+    if (isList) return 'MiraiCompoundLiteral(list: $value)';
+    if (isMap) return 'MiraiCompoundLiteral(map: $value)';
+    return 'MiraiCompoundLiteral()';
+  }
+
+  static MiraiCompoundLiteral fromParsed(List<dynamic> parsed) {
+    if (parsed[0].value == '[') {
+      return MiraiCompoundLiteral.list(parsed[1][0]
+          .elements
+          .map((parsed) => MiraiExpression.fromParsed(parsed))
+          .cast<MiraiExpression>()
+          .toList());
+    }
+
+    if (parsed[0].value == '{') {
+      Map<String, MiraiExpression> map = {};
+
+      if (parsed[1][0] is List<dynamic>) {
+        map[parsed[1][0][0].value[1].join()] =
+            MiraiExpression.fromParsed(parsed[1][0][2]);
+      }
+
+      if (parsed[1][1] is List<dynamic>) {
+        map.addEntries(parsed[1][1]
+            .map((parsed) => MapEntry<String, MiraiExpression>(
+                parsed[1][0].value[1].join(),
+                MiraiExpression.fromParsed(parsed[1][2])))
+            .cast<MapEntry<String, MiraiExpression>>()
+            .toList());
+      }
+      return MiraiCompoundLiteral.map(map);
+    }
+
     throw Exception('Cannot parse: $parsed');
   }
 }

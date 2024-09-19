@@ -4,6 +4,7 @@ import 'statement/block.dart';
 import 'statement/break.dart';
 import 'statement/continue.dart';
 import 'statement/defer.dart';
+import 'statement/return.dart';
 import 'statement/unreachable.dart';
 
 class MiraiStatement {
@@ -58,6 +59,8 @@ class MiraiStatement {
           case 'defer':
           case 'errdefer':
             return MiraiDeferStatement.fromParsed(parsed);
+          case 'return':
+            return MiraiReturnStatement.fromParsed(parsed);
         }
       }
     }
