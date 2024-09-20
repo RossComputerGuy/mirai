@@ -1,3 +1,4 @@
+import 'package:mirai/src/lang/mirai/types/expression/assignable.dart';
 import 'package:mirai/src/lang/mirai/types/expression.dart';
 import 'package:mirai/src/lang/mirai/types/literal.dart';
 import 'package:mirai/src/lang/mirai/types/primary.dart';
@@ -73,7 +74,11 @@ void testPrimary() {
     final result = parser.parse('(value)');
     final parsed = MiraiPrimary.fromParsed(result.value);
 
-    expect(parsed, MiraiPrimary.wrappedExpression(MiraiExpression()));
+    expect(
+        parsed,
+        MiraiPrimary.wrappedExpression(MiraiExpression(
+            assignable: MiraiAssignableExpression(
+                MiraiPrimary.identifier('value'), []))));
   });
 
   test('fromParsed compound literal list', () {
@@ -85,9 +90,15 @@ void testPrimary() {
     expect(
         parsed,
         MiraiPrimary.compoundLiteral(MiraiCompoundLiteral.list([
-          MiraiExpression(isPointer: false),
-          MiraiExpression(isPointer: false),
-          MiraiExpression(isPointer: false)
+          MiraiExpression(
+              assignable: MiraiAssignableExpression(
+                  MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+          MiraiExpression(
+              assignable: MiraiAssignableExpression(
+                  MiraiPrimary.literal(MiraiLiteral(MiraiNumber(2))))),
+          MiraiExpression(
+              assignable: MiraiAssignableExpression(
+                  MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
         ])));
   });
 
@@ -101,9 +112,15 @@ void testPrimary() {
         parsed,
         MiraiPrimary.compoundLiteral(
             MiraiCompoundLiteral.list([
-              MiraiExpression(isPointer: false),
-              MiraiExpression(isPointer: false),
-              MiraiExpression(isPointer: false)
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(2))))),
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
             ]),
             types: [
               MiraiType.qualified(MiraiQualified(['A']))
@@ -120,9 +137,15 @@ void testPrimary() {
         parsed,
         MiraiPrimary.compoundLiteral(
             MiraiCompoundLiteral.list([
-              MiraiExpression(isPointer: false),
-              MiraiExpression(isPointer: false),
-              MiraiExpression(isPointer: false)
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(2))))),
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
             ]),
             isConst: true));
   });
@@ -137,9 +160,15 @@ void testPrimary() {
         parsed,
         MiraiPrimary.compoundLiteral(
             MiraiCompoundLiteral.list([
-              MiraiExpression(isPointer: false),
-              MiraiExpression(isPointer: false),
-              MiraiExpression(isPointer: false)
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(2))))),
+              MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
             ]),
             isConst: true,
             types: [
@@ -156,9 +185,15 @@ void testPrimary() {
     expect(
         parsed,
         MiraiPrimary.compoundLiteral(MiraiCompoundLiteral.map({
-          'a': MiraiExpression(isPointer: false),
-          'b': MiraiExpression(isPointer: false),
-          'c': MiraiExpression(isPointer: false)
+          'a': MiraiExpression(
+              assignable: MiraiAssignableExpression(
+                  MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+          'b': MiraiExpression(
+              assignable: MiraiAssignableExpression(
+                  MiraiPrimary.literal(MiraiLiteral(MiraiString('2'))))),
+          'c': MiraiExpression(
+              assignable: MiraiAssignableExpression(
+                  MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
         })));
   });
 
@@ -172,9 +207,15 @@ void testPrimary() {
         parsed,
         MiraiPrimary.compoundLiteral(
             MiraiCompoundLiteral.map({
-              'a': MiraiExpression(isPointer: false),
-              'b': MiraiExpression(isPointer: false),
-              'c': MiraiExpression(isPointer: false)
+              'a': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+              'b': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiString('2'))))),
+              'c': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
             }),
             isConst: true));
   });
@@ -189,9 +230,15 @@ void testPrimary() {
         parsed,
         MiraiPrimary.compoundLiteral(
             MiraiCompoundLiteral.map({
-              'a': MiraiExpression(isPointer: false),
-              'b': MiraiExpression(isPointer: false),
-              'c': MiraiExpression(isPointer: false)
+              'a': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+              'b': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiString('2'))))),
+              'c': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
             }),
             types: [
               MiraiType.qualified(MiraiQualified(['A']))
@@ -208,9 +255,15 @@ void testPrimary() {
         parsed,
         MiraiPrimary.compoundLiteral(
             MiraiCompoundLiteral.map({
-              'a': MiraiExpression(isPointer: false),
-              'b': MiraiExpression(isPointer: false),
-              'c': MiraiExpression(isPointer: false)
+              'a': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+              'b': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiString('2'))))),
+              'c': MiraiExpression(
+                  assignable: MiraiAssignableExpression(
+                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
             }),
             isConst: true,
             types: [

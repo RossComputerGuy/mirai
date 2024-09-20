@@ -185,7 +185,7 @@ void testStatement() {
     expect(parsed, MiraiStatement(MiraiAsmStatement('hlt')));
 
     expect(parsed.toString(),
-        'MiraiStatement(MiraiAsmStatement(\"hlt\", isVolatile: false, params: {a: MiraiExpression(isPointer: false), b: MiraiExpression(isPointer: false), c: MiraiExpression(isPointer: false)}), labels: [])');
+        'MiraiStatement(MiraiAsmStatement("hlt", isVolatile: false, params: {a: MiraiExpression(isPointer: false, assignable: MiraiAssignableExpression(MiraiPrimary(literal: MiraiLiteral(MiraiNumber(1))), [])), b: MiraiExpression(isPointer: false, assignable: MiraiAssignableExpression(MiraiPrimary(literal: MiraiLiteral(MiraiBoolean(true))), [])), c: MiraiExpression(isPointer: false, assignable: MiraiAssignableExpression(MiraiPrimary(identifier: value), []))}), labels: [])');
   });
 
   test('fromParsed invalid', () {

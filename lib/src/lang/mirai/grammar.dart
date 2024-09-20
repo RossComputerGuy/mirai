@@ -375,7 +375,7 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   Parser argumentList() =>
       ref0(argumentElement).plusSeparated(ref1(token, ','));
 
-  Parser argumentElement() => ref0(label) & ref0(expression) | ref0(expression);
+  Parser argumentElement() => ref0(label).optional() & ref0(expression);
 
   Parser label() => ref0(identifier) & ref1(token, ':');
 
