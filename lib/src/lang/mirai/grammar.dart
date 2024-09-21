@@ -622,7 +622,9 @@ class MiraiGrammarDefinition extends GrammarDefinition {
   Parser functionPrefix() => ref0(fnToken) & ref0(identifier);
 
   Parser functionBody() =>
-      ref1(token, '=>') & ref0(block) | (ref0(expression) & ref1(token, ';'));
+      (ref1(token, '=>') & ref0(block) |
+          (ref0(expression) & ref1(token, ';'))) |
+      ref0(block);
 
   Parser functionExpressionBody() =>
       ref1(token, '=>') & (ref0(block) | ref0(expression));
