@@ -1,37 +1,39 @@
+import 'package:petitparser/petitparser.dart';
 import 'expression/assignable.dart';
+import 'operator.dart';
 
 class MiraiExpression {
-  final bool isPointer;
   final MiraiAssignableExpression? assignable;
+  final MiraiAssignmentOperator? assignOperator;
+  final MiraiExpression? innerExpression;
 
   const MiraiExpression({
-    this.isPointer = false,
     this.assignable = null,
+    this.assignOperator = null,
+    this.innerExpression = null,
   });
 
   @override
   bool operator ==(Object other) {
     if (other is MiraiExpression) {
-      return other.isPointer == isPointer && other.assignable == assignable;
+      return other.assignable == assignable &&
+          other.assignOperator == assignOperator &&
+          other.innerExpression == innerExpression;
     }
     return false;
   }
 
   @override
   String toString() =>
-      'MiraiExpression(isPointer: ${isPointer ? 'true' : 'false'}, assignable: $assignable)';
+      'MiraiExpression(assignable: $assignable, assignOperator: $assignOperator, innerExpression: $innerExpression)';
 
-  static MiraiExpression fromParsed(List<dynamic> parsed) {
-    if (parsed.length == 2) {
-      return MiraiExpression(
-        isPointer: parsed[0] == null ? false : parsed[0].value == '&',
-        assignable: parsed[1][0] != null
-            ? MiraiAssignableExpression.fromParsed(
-                parsed[1][0][0][0][0][0][0][0][0][0][0][0])
+  static MiraiExpression fromParsed(List<dynamic> parsed) => MiraiExpression(
+        assignable: parsed[0] != null
+            ? MiraiAssignableExpression.fromParsed(parsed[0])
             : null,
+        assignOperator: parsed.length > 2
+            ? MiraiAssignmentOperator.fromParsed(parsed[1])
+            : null,
+        innerExpression: parsed.length > 2 ? fromParsed(parsed[2]) : null,
       );
-    }
-
-    throw Exception('Cannot parse: $parsed');
-  }
 }

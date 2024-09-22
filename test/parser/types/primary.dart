@@ -23,7 +23,7 @@ void testPrimary() {
     final result = parser.parse('super');
     final parsed = MiraiPrimary.fromParsed(result.value);
 
-    expect(parsed, MiraiPrimary.assignableSuper());
+    expect(parsed, MiraiPrimary.assignableSuper(null));
   });
 
   test('fromParsed this', () {
@@ -32,7 +32,7 @@ void testPrimary() {
     final result = parser.parse('this');
     final parsed = MiraiPrimary.fromParsed(result.value);
 
-    expect(parsed, MiraiPrimary.assignableThis());
+    expect(parsed, MiraiPrimary.assignableThis(null));
   });
 
   test('fromParsed literal', () {
@@ -139,13 +139,13 @@ void testPrimary() {
             MiraiCompoundLiteral.list([
               MiraiExpression(
                   assignable: MiraiAssignableExpression(
-                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(1))))),
+                      MiraiPrimary.literal(MiraiLiteral.int(1)), [])),
               MiraiExpression(
                   assignable: MiraiAssignableExpression(
-                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(2))))),
+                      MiraiPrimary.literal(MiraiLiteral.int(2)), [])),
               MiraiExpression(
                   assignable: MiraiAssignableExpression(
-                      MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
+                      MiraiPrimary.literal(MiraiLiteral.int(3)), []))
             ]),
             isConst: true));
   });
@@ -172,7 +172,9 @@ void testPrimary() {
             ]),
             isConst: true,
             types: [
-              MiraiType.qualified(MiraiQualified(['A']))
+              MiraiType.qualified(MiraiQualified(['A'])),
+              MiraiType.qualified(MiraiQualified(['B'])),
+              MiraiType.qualified(MiraiQualified(['C'])),
             ]));
   });
 
@@ -241,7 +243,9 @@ void testPrimary() {
                       MiraiPrimary.literal(MiraiLiteral(MiraiNumber(3)))))
             }),
             types: [
-              MiraiType.qualified(MiraiQualified(['A']))
+              MiraiType.qualified(MiraiQualified(['A'])),
+              MiraiType.qualified(MiraiQualified(['B'])),
+              MiraiType.qualified(MiraiQualified(['C']))
             ]));
   });
 
@@ -267,7 +271,9 @@ void testPrimary() {
             }),
             isConst: true,
             types: [
-              MiraiType.qualified(MiraiQualified(['A']))
+              MiraiType.qualified(MiraiQualified(['A'])),
+              MiraiType.qualified(MiraiQualified(['B'])),
+              MiraiType.qualified(MiraiQualified(['C'])),
             ]));
   });
 

@@ -33,21 +33,31 @@ class MiraiAssignableExpression {
   @override
   String toString() => 'MiraiAssignableExpression($base, $arguments)';
 
-  static MiraiAssignableExpression fromParsed(List<dynamic> parsed) =>
-      MiraiAssignableExpression(
+  static MiraiAssignableExpression fromParsed(List<dynamic> parsed) {
+    if (parsed.length == 2) {
+      if (parsed[1] is Token<dynamic>) {
+        return MiraiAssignableExpression(MiraiPrimary.fromParsed(parsed));
+      }
+
+      return MiraiAssignableExpression(
           parsed[0] != null ? MiraiPrimary.fromParsed(parsed[0]) : null,
           parsed[1]
               .map((parsed) {
                 if (parsed.length == 2)
-                  return MiraiAssignableSelector.fromParsed(parsed);
+                  return MiraiAssignableSelector.fromParsed(parsed[0]);
                 if (parsed.length == 5)
                   return parsed[1]
                       .elements
                       .map((parsed) => MiraiArgument.fromParsed(parsed))
                       .cast<MiraiArgument>()
                       .toList();
-                throw Exception('Cannot parse: $parsed');
+                throw Exception(
+                    'Cannot parse argument: $parsed - ${parsed.length}');
               })
               .cast<Object>()
               .toList());
+    }
+
+    throw Exception('Cannot parse: $parsed - ${parsed.length}');
+  }
 }

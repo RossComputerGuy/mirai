@@ -16,8 +16,9 @@ class MiraiAsmStatement {
   String toString() =>
       'MiraiAsmStatement(\"$code\", isVolatile: ${isVolatile ? 'true' : 'false'}, params: $params)';
 
-  static MiraiAsmStatement fromParsed(List<dynamic> parsed) =>
-      MiraiAsmStatement(
+  static MiraiAsmStatement fromParsed(List<dynamic> parsed) {
+    if (parsed.length == 7) {
+      return MiraiAsmStatement(
         parsed[3][1].join(),
         isVolatile: parsed[1] == null ? false : parsed[1].value == 'volatile',
         params: Map.fromEntries(parsed[4]
@@ -26,4 +27,8 @@ class MiraiAsmStatement {
             .cast<MapEntry<String, dynamic>>()
             .toList()),
       );
+    }
+
+    throw Exception('Cannot parse: $parsed - ${parsed.length}');
+  }
 }

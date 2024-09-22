@@ -31,8 +31,9 @@ class MiraiFormalParameter {
                   .cast<MiraiAnnotation>()
                   .toList()
               : null,
-          defaultValue:
-              parsed[1] != null ? MiraiExpression.fromParsed(parsed[1]) : null);
+          defaultValue: parsed[1] != null
+              ? MiraiExpression.fromParsed(parsed[1][1])
+              : null);
 
   static List<MiraiFormalParameter> fromParsedList(List<dynamic> parsed) {
     if (parsed.length == 3) {
@@ -45,7 +46,17 @@ class MiraiFormalParameter {
             .toList());
         return value;
       }
+
+      if (parsed[1] == null) return [];
     }
-    return [];
+
+    if (parsed.length == 4) {
+      List<MiraiFormalParameter> value = [];
+      value.add(MiraiFormalParameter.fromParsed([parsed[1], null]));
+      // TODO: add more parameters
+      return value;
+    }
+
+    throw Exception('Cannot parse: $parsed - ${parsed.length}');
   }
 }

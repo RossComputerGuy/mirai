@@ -94,8 +94,9 @@ class MiraiPrimary {
   final MiraiCompoundLiteral? compoundLiteral;
   final List<MiraiType> types;
   final MiraiFunctionExpression? functionExpression;
+  final bool isPointer;
 
-  const MiraiPrimary.literal(MiraiLiteral value)
+  const MiraiPrimary.literal(MiraiLiteral value, {this.isPointer = false})
       : literal = value,
         identifier = null,
         constructClass = null,
@@ -107,7 +108,7 @@ class MiraiPrimary {
         compoundLiteral = null,
         types = const [],
         functionExpression = null;
-  const MiraiPrimary.identifier(String value)
+  const MiraiPrimary.identifier(String value, {this.isPointer = false})
       : literal = null,
         identifier = value,
         constructClass = null,
@@ -119,7 +120,7 @@ class MiraiPrimary {
         compoundLiteral = null,
         types = const [],
         functionExpression = null;
-  const MiraiPrimary.assignableSuper([this.selector = null])
+  const MiraiPrimary.assignableSuper(this.selector, {this.isPointer = false})
       : literal = null,
         identifier = null,
         constructClass = null,
@@ -130,7 +131,7 @@ class MiraiPrimary {
         compoundLiteral = null,
         types = const [],
         functionExpression = null;
-  const MiraiPrimary.assignableThis([this.selector = null])
+  const MiraiPrimary.assignableThis(this.selector, {this.isPointer = false})
       : literal = null,
         identifier = null,
         constructClass = null,
@@ -141,7 +142,8 @@ class MiraiPrimary {
         compoundLiteral = null,
         types = const [],
         functionExpression = null;
-  const MiraiPrimary.constructClass(MiraiConstructClass value)
+  const MiraiPrimary.constructClass(MiraiConstructClass value,
+      {this.isPointer = false})
       : literal = null,
         identifier = null,
         constructClass = value,
@@ -153,7 +155,8 @@ class MiraiPrimary {
         compoundLiteral = null,
         types = const [],
         functionExpression = null;
-  const MiraiPrimary.wrappedExpression(MiraiExpression value)
+  const MiraiPrimary.wrappedExpression(MiraiExpression value,
+      {this.isPointer = false})
       : literal = null,
         identifier = null,
         constructClass = null,
@@ -169,6 +172,7 @@ class MiraiPrimary {
     MiraiCompoundLiteral value, {
     this.isConst = false,
     this.types = const [],
+    this.isPointer = false,
   })  : literal = null,
         identifier = null,
         constructClass = null,
@@ -178,7 +182,8 @@ class MiraiPrimary {
         wrappedExpression = null,
         compoundLiteral = value,
         functionExpression = null;
-  const MiraiPrimary.functionExpression(MiraiFunctionExpression value)
+  const MiraiPrimary.functionExpression(MiraiFunctionExpression value,
+      {this.isPointer = false})
       : literal = null,
         identifier = null,
         constructClass = null,
@@ -212,116 +217,130 @@ class MiraiPrimary {
           other.isConst == isConst &&
           other.wrappedExpression == wrappedExpression &&
           other.compoundLiteral == compoundLiteral &&
-          other.functionExpression == functionExpression;
+          other.functionExpression == functionExpression &&
+          other.isPointer == isPointer;
     }
     return false;
   }
 
   @override
   String toString() {
-    if (isThis) return 'MiraiPrimary(isThis: true, $selector)';
-    if (isSuper) return 'MiraiPrimary(isSuper: true, $selector)';
-    if (identifier != null) return 'MiraiPrimary(identifier: $identifier)';
-    if (literal != null) return 'MiraiPrimary(literal: $literal)';
+    if (isThis)
+      return 'MiraiPrimary(isThis: true, isPointer: $isPointer, $selector)';
+    if (isSuper)
+      return 'MiraiPrimary(isSuper: true, isPointer: $isPointer, $selector)';
+    if (identifier != null)
+      return 'MiraiPrimary(isPointer: $isPointer, identifier: $identifier)';
+    if (literal != null)
+      return 'MiraiPrimary(isPointer: $isPointer, literal: $literal)';
     if (constructClass != null)
-      return 'MiraiPrimary(constructClass: $constructClass)';
+      return 'MiraiPrimary(isPointer: $isPointer, constructClass: $constructClass)';
     if (wrappedExpression != null)
-      return 'MiraiPrimary(wrappedExpression: $wrappedExpression)';
+      return 'MiraiPrimary(isPointer: $isPointer, wrappedExpression: $wrappedExpression)';
     if (compoundLiteral != null)
-      return 'MiraiPrimary(compoundLiteral: $compoundLiteral, isConst: ${isConst ? 'true' : 'false'}, types: $types)';
+      return 'MiraiPrimary(isPointer: $isPointer, compoundLiteral: $compoundLiteral, isConst: ${isConst ? 'true' : 'false'}, types: $types)';
     if (functionExpression != null)
-      return 'MiraiPrimary(functionExpression: $functionExpression)';
+      return 'MiraiPrimary(isPointer: $isPointer, functionExpression: $functionExpression)';
     return 'MiraiPrimary()';
   }
 
-  static MiraiPrimary fromParsed(dynamic parsed) {
-    if (parsed is Token<dynamic>) {
-      if (parsed.value is List<dynamic>) {
-        if (parsed.value.length == 2) {
-          if (parsed.value[0].toLowerCase() != '0x') {
+  static MiraiPrimary fromParsed(List<dynamic> parsed) {
+    if (parsed[1] is Token<dynamic>) {
+      if (parsed[1].value is List<dynamic>) {
+        if (parsed[1].value.length == 2) {
+          if (parsed[1].value[0].toLowerCase() != '0x') {
             return MiraiPrimary.identifier(
-                parsed.value[0] + parsed.value[1].join());
+                parsed[1].value[0] + parsed[1].value[1].join());
           }
         }
       }
 
-      return MiraiPrimary.literal(MiraiLiteral.fromParsed(parsed));
+      return MiraiPrimary.literal(MiraiLiteral.fromParsed(parsed[1]));
     }
 
-    if (parsed is List<dynamic>) {
-      if (parsed.length == 5) {
-        if (parsed[0] is Token<dynamic>) {
-          if (parsed[0].value == 'fn') {
-            final name = parsed[1] != null
-                ? parsed[1].value[0] + parsed[1].value[1].join()
+    if (parsed[1] is List<dynamic>) {
+      if (parsed[1].length == 5) {
+        if (parsed[1][0] is Token<dynamic>) {
+          if (parsed[1][0].value == 'fn') {
+            final name = parsed[1][1] != null
+                ? parsed[1][1].value[0] + parsed[1][1].value[1].join()
                 : null;
-            final returnType =
-                parsed[3] != null ? MiraiType.fromParsed(parsed[3]) : null;
+            final returnType = parsed[1][3] != null
+                ? MiraiType.fromParsed(parsed[1][3])
+                : null;
 
-            final params = MiraiFormalParameter.fromParsedList(parsed[2]);
+            final params = MiraiFormalParameter.fromParsedList(parsed[1][2]);
 
-            if (parsed[4][1][0] is Token<dynamic>) {
-              if (parsed[4][1][0].value == '{') {
+            if (parsed[1][4][1][0] is Token<dynamic>) {
+              if (parsed[1][4][1][0].value == '{') {
                 return MiraiPrimary.functionExpression(
                     MiraiFunctionExpression.block(name, params,
-                        MiraiBlockStatement.fromParsed(parsed[4][1]),
+                        MiraiBlockStatement.fromParsed(parsed[1][4][1]),
                         returnType: returnType));
               }
             }
 
             return MiraiPrimary.functionExpression(MiraiFunctionExpression(
-                name, params, MiraiExpression.fromParsed(parsed[4][1]),
+                name, params, MiraiExpression.fromParsed(parsed[1][4][1]),
                 returnType: returnType));
           }
         }
       }
 
-      if (parsed.length == 3) {
-        if (parsed[0] is Token<dynamic>) {
-          if (parsed[0].value == '(') {
+      if (parsed[1].length == 3) {
+        if (parsed[1][0] is Token<dynamic>) {
+          if (parsed[1][0].value == '(') {
             return MiraiPrimary.wrappedExpression(
-                MiraiExpression.fromParsed(parsed[1]));
+                MiraiExpression.fromParsed(parsed[1][1]));
           }
         }
 
-        if (parsed[2] is List<dynamic>) {
-          if (parsed[2][0].value != '(') {
+        if (parsed[1][2] is List<dynamic>) {
+          if (parsed[1][2][0].value != '(') {
             List<MiraiType> types = [];
-            if (parsed[1] != null) {
-              types.add(MiraiType.fromParsed(parsed[1][1][0]));
+            if (parsed[1][1] != null) {
+              types.add(MiraiType.fromParsed(parsed[1][1][1][0]));
+              types.addAll(parsed[1][1][1][1]
+                  .map((parsed) => MiraiType.fromParsed(parsed[1]))
+                  .cast<MiraiType>()
+                  .toList());
             }
 
             return MiraiPrimary.compoundLiteral(
-                MiraiCompoundLiteral.fromParsed(parsed[2]),
-                isConst: parsed[0] != null ? parsed[0].value == 'const' : false,
+                MiraiCompoundLiteral.fromParsed(parsed[1][2]),
+                isConst: parsed[1][0] != null
+                    ? parsed[1][0].value == 'const'
+                    : false,
                 types: types);
           }
         }
 
         return MiraiPrimary.constructClass(MiraiConstructClass(
-          MiraiType.fromParsed(parsed[1]),
-          parsed[2][1] != null
-              ? parsed[2][1]
+          MiraiType.fromParsed(parsed[1][1]),
+          parsed[1][2][1] != null
+              ? parsed[1][2][1]
                   .elements
                   .map((parsed) => MiraiExpression.fromParsed(parsed))
                   .cast<MiraiExpression>()
                   .toList()
               : [],
-          isConst: parsed[0] == null ? false : parsed[0].value == 'const',
+          isConst: parsed[1][0] == null ? false : parsed[1][0].value == 'const',
         ));
       }
 
-      if (parsed.length == 2) {
-        final selector = parsed[1] != null
-            ? MiraiAssignableSelector.fromParsed(parsed[1])
-            : null;
+      if (parsed[1].length == 2) {
+        if (parsed[1][0] is Token<dynamic>) {
+          final selector = parsed[1][1] != null
+              ? MiraiAssignableSelector.fromParsed(parsed[1][1])
+              : null;
 
-        if (parsed[0].value == 'super') {
-          return MiraiPrimary.assignableSuper(selector);
-        }
+          if (parsed[1][0].value == 'super') {
+            return MiraiPrimary.assignableSuper(selector);
+          }
 
-        if (parsed[0].value == 'this') {
-          return MiraiPrimary.assignableThis(selector);
+          if (parsed[1][0].value == 'this') {
+            return MiraiPrimary.assignableThis(selector);
+          }
         }
       }
     }

@@ -56,7 +56,8 @@ void testAssignableExpression() {
     final result = parser.parse('super[0]');
     final parsed = MiraiAssignableExpression.fromParsed(result.value);
 
-    expect(parsed, MiraiAssignableExpression(MiraiPrimary.assignableSuper()));
+    expect(
+        parsed, MiraiAssignableExpression(MiraiPrimary.assignableSuper(null)));
   });
 }
 

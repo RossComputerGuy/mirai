@@ -551,29 +551,29 @@ class MiraiGrammarDefinition extends GrammarDefinition {
       nullSafetyAnnotations().optional();
 
   Parser primary() =>
-      ref0(constToken).optional() &
-          ref0(typeArguments).optional() &
-          ref0(compoundLiteral) |
-      (ref0(newToken).optional() | ref0(constToken))
-              .seq(ref0(fnToken).not())
-              .pick(0) &
-          ref0(type) &
-          ref0(arguments) |
-      ref0(functionExpression) |
-      ref0(expressionInParentheses) |
-      (ref0(thisToken) | ref0(superToken)) &
-          ref0(assignableSelector).optional() |
-      ref0(literal) |
-      ref0(identifier);
+      ref1(token, '&').optional() &
+      (ref0(constToken).optional() &
+              ref0(typeArguments).optional() &
+              ref0(compoundLiteral) |
+          (ref0(newToken).optional() | ref0(constToken))
+                  .seq(ref0(fnToken).not())
+                  .pick(0) &
+              ref0(type) &
+              ref0(arguments) |
+          ref0(functionExpression) |
+          ref0(expressionInParentheses) |
+          (ref0(thisToken) | ref0(superToken)) &
+              ref0(assignableSelector).optional() |
+          ref0(literal) |
+          ref0(identifier));
 
   Parser constantExpression() => ref0(expression);
 
-  Parser expression() =>
-      ref1(token, '&').optional() &
-      (ref0(assignableExpression) &
-              ref0(assignmentOperator) &
-              ref0(expression) |
-          ref0(conditionalExpression));
+  Parser expression() => (ref0(assignableExpression) &
+          ref0(assignmentOperator) &
+          ref0(expression) |
+      ref0(assignableExpression) |
+      ref0(conditionalExpression));
 
   Parser expressionList() => ref0(expression).plusSeparated(ref1(token, ','));
 
