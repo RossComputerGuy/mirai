@@ -245,17 +245,21 @@ class MiraiPrimary {
   }
 
   static MiraiPrimary fromParsed(List<dynamic> parsed) {
+    final isPointer = parsed[0] != null ? parsed[0].value == '&' : false;
+
     if (parsed[1] is Token<dynamic>) {
       if (parsed[1].value is List<dynamic>) {
         if (parsed[1].value.length == 2) {
           if (parsed[1].value[0].toLowerCase() != '0x') {
             return MiraiPrimary.identifier(
-                parsed[1].value[0] + parsed[1].value[1].join());
+                parsed[1].value[0] + parsed[1].value[1].join(),
+                isPointer: isPointer);
           }
         }
       }
 
-      return MiraiPrimary.literal(MiraiLiteral.fromParsed(parsed[1]));
+      return MiraiPrimary.literal(MiraiLiteral.fromParsed(parsed[1]),
+          isPointer: isPointer);
     }
 
     if (parsed[1] is List<dynamic>) {
@@ -276,13 +280,16 @@ class MiraiPrimary {
                 return MiraiPrimary.functionExpression(
                     MiraiFunctionExpression.block(name, params,
                         MiraiBlockStatement.fromParsed(parsed[1][4][1]),
-                        returnType: returnType));
+                        returnType: returnType),
+                    isPointer: isPointer);
               }
             }
 
-            return MiraiPrimary.functionExpression(MiraiFunctionExpression(
-                name, params, MiraiExpression.fromParsed(parsed[1][4][1]),
-                returnType: returnType));
+            return MiraiPrimary.functionExpression(
+                MiraiFunctionExpression(
+                    name, params, MiraiExpression.fromParsed(parsed[1][4][1]),
+                    returnType: returnType),
+                isPointer: isPointer);
           }
         }
       }
@@ -291,7 +298,8 @@ class MiraiPrimary {
         if (parsed[1][0] is Token<dynamic>) {
           if (parsed[1][0].value == '(') {
             return MiraiPrimary.wrappedExpression(
-                MiraiExpression.fromParsed(parsed[1][1]));
+                MiraiExpression.fromParsed(parsed[1][1]),
+                isPointer: isPointer);
           }
         }
 
@@ -311,21 +319,25 @@ class MiraiPrimary {
                 isConst: parsed[1][0] != null
                     ? parsed[1][0].value == 'const'
                     : false,
-                types: types);
+                types: types,
+                isPointer: isPointer);
           }
         }
 
-        return MiraiPrimary.constructClass(MiraiConstructClass(
-          MiraiType.fromParsed(parsed[1][1]),
-          parsed[1][2][1] != null
-              ? parsed[1][2][1]
-                  .elements
-                  .map((parsed) => MiraiExpression.fromParsed(parsed))
-                  .cast<MiraiExpression>()
-                  .toList()
-              : [],
-          isConst: parsed[1][0] == null ? false : parsed[1][0].value == 'const',
-        ));
+        return MiraiPrimary.constructClass(
+            MiraiConstructClass(
+                MiraiType.fromParsed(parsed[1][1]),
+                parsed[1][2][1] != null
+                    ? parsed[1][2][1]
+                        .elements
+                        .map((parsed) => MiraiExpression.fromParsed(parsed))
+                        .cast<MiraiExpression>()
+                        .toList()
+                    : [],
+                isConst: parsed[1][0] == null
+                    ? false
+                    : parsed[1][0].value == 'const'),
+            isPointer: isPointer);
       }
 
       if (parsed[1].length == 2) {
@@ -335,11 +347,11 @@ class MiraiPrimary {
               : null;
 
           if (parsed[1][0].value == 'super') {
-            return MiraiPrimary.assignableSuper(selector);
+            return MiraiPrimary.assignableSuper(selector, isPointer: isPointer);
           }
 
           if (parsed[1][0].value == 'this') {
-            return MiraiPrimary.assignableThis(selector);
+            return MiraiPrimary.assignableThis(selector, isPointer: isPointer);
           }
         }
       }

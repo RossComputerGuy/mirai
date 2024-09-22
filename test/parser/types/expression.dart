@@ -51,7 +51,7 @@ void testExpression() {
         parsed,
         MiraiExpression(
             assignable: MiraiAssignableExpression(
-                MiraiPrimary.identifier('value'), [])));
+                MiraiPrimary.identifier('value', isPointer: true), [])));
   });
 
   test('fromParsed assignment', () {
