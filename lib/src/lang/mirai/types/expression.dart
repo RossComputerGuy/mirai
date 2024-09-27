@@ -29,11 +29,15 @@ class MiraiExpression {
 
   static MiraiExpression fromParsed(List<dynamic> parsed) => MiraiExpression(
         assignable: parsed[0] != null
-            ? MiraiAssignableExpression.fromParsed(parsed[0])
+            ? MiraiAssignableExpression.fromParsed(parsed[0][0])
+            : (parsed[1] != null && !(parsed[1] is Token<dynamic>)
+                ? MiraiAssignableExpression.fromParsed(parsed[1][0])
+                : null),
+        assignOperator: parsed[1] != null && parsed[1][0] is Token<dynamic>
+            ? MiraiAssignmentOperator.fromParsed(parsed[1][0])
             : null,
-        assignOperator: parsed.length > 2
-            ? MiraiAssignmentOperator.fromParsed(parsed[1])
+        innerExpression: parsed[1] != null && parsed[1][0] is Token<dynamic>
+            ? fromParsed(parsed[1][1])
             : null,
-        innerExpression: parsed.length > 2 ? fromParsed(parsed[2]) : null,
       );
 }

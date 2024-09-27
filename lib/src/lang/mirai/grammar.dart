@@ -569,11 +569,10 @@ class MiraiGrammarDefinition extends GrammarDefinition {
 
   Parser constantExpression() => ref0(expression);
 
-  Parser expression() => (ref0(assignableExpression) &
-          ref0(assignmentOperator) &
-          ref0(expression) |
-      ref0(assignableExpression) |
-      ref0(conditionalExpression));
+  Parser expression() =>
+      (ref0(assignableExpression) &
+          (ref0(assignmentOperator) & ref0(expression)).optional()) |
+      ref0(conditionalExpression);
 
   Parser expressionList() => ref0(expression).plusSeparated(ref1(token, ','));
 

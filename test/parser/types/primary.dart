@@ -302,7 +302,16 @@ void testPrimary() {
     final result = parser.parse('fn () String => "Hello, world"');
     final parsed = MiraiPrimary.fromParsed(result.value);
 
-    print(parsed);
+    expect(
+        parsed,
+        MiraiPrimary.functionExpression(MiraiFunctionExpression(
+            null,
+            [],
+            MiraiExpression(
+                assignable: MiraiAssignableExpression(
+                    MiraiPrimary.literal(MiraiLiteral.string("Hello, world")),
+                    [])),
+            returnType: MiraiType.qualified(MiraiQualified(['String'])))));
   });
 
   test('fromParsed function expression statement optional argument', () {
@@ -362,6 +371,7 @@ void testPrimary() {
         parser.parse('fn combineString(a: String, b: String) String => a + b');
     final parsed = MiraiPrimary.fromParsed(result.value);
 
+    print(result.value);
     print(parsed);
   });
 }

@@ -1,5 +1,6 @@
 import 'package:mirai/src/lang/mirai/types/expression/assignable.dart';
 import 'package:mirai/src/lang/mirai/types/expression.dart';
+import 'package:mirai/src/lang/mirai/types/operator.dart';
 import 'package:mirai/src/lang/mirai/types/primary.dart';
 import 'package:mirai/src/lang/mirai/types/literal.dart';
 import 'package:mirai/src/lang/mirai/types/selector.dart';
@@ -60,7 +61,15 @@ void testExpression() {
     final result = parser.parse('value = 1');
     final parsed = MiraiExpression.fromParsed(result.value);
 
-    print(parsed);
+    expect(
+        parsed,
+        MiraiExpression(
+            assignable:
+                MiraiAssignableExpression(MiraiPrimary.identifier('value'), []),
+            assignOperator: MiraiAssignmentOperator.assign,
+            innerExpression: MiraiExpression(
+                assignable: MiraiAssignableExpression(
+                    MiraiPrimary.literal(MiraiLiteral.int(1)), []))));
   });
 }
 

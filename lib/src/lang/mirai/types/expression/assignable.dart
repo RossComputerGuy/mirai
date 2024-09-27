@@ -9,6 +9,10 @@ class MiraiArgument {
 
   const MiraiArgument(this.value, this.label);
 
+  @override
+  String toString() =>
+      'MiraiArgument($value, ${label != null ? '\"$label\"' : 'null'})';
+
   static MiraiArgument fromParsed(List<dynamic> parsed) => MiraiArgument(
       MiraiExpression.fromParsed(parsed[1]),
       parsed[0] != null
